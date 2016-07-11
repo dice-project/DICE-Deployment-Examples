@@ -1,0 +1,134 @@
+tosca_definitions_version: cloudify_dsl_1_2
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
+  - http://dice-project.github.io/cloudify-openstack-plugin/1.4/plugin.yaml
+  - http://dice-project.github.io/cloudify-chef-plugin/1.3.2/plugin.yaml
+  - http://dice-project.github.io/DICE-Deployment-Cloudify/spec/openstack/0.1.2/plugin.yaml
+
+
+inputs:
+  agent_user:
+    default: ubuntu
+  small_image_id:
+    default: ca290f2d-5163-483b-9dd5-fafe21517c0a
+  small_flavor_id:
+    default: d3046a41-245a-4042-862e-59568e81f8fa
+  medium_image_id:
+    default: ca290f2d-5163-483b-9dd5-fafe21517c0a
+  medium_flavor_id:
+    default: d3046a41-245a-4042-862e-59568e81f8fa
+  large_image_id:
+    default: ca290f2d-5163-483b-9dd5-fafe21517c0a
+  large_flavor_id:
+    default: d3046a41-245a-4042-862e-59568e81f8fa
+
+
+node_templates:
+  zookeeper_vm:
+    type: dice.hosts.Medium
+    relationships:
+      - type: cloudify.openstack.server_connected_to_floating_ip
+        target: zookeeper_floating_ip
+      - type: cloudify.openstack.server_connected_to_security_group
+        target: zookeeper_security_group
+
+  zookeeper_quorum:
+    type: dice.components.zookeeper.Quorum
+    relationships:
+      - type: dice.relationships.zookeeper.QuorumContains
+        target: zookeeper_vm
+
+  zookeeper:
+    type: dice.components.zookeeper.Server
+    properties:
+      configuration:
+        tickTime: 2000
+        initLimit: 5
+        syncLimit: 2
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: zookeeper_vm
+      - type: dice.relationships.zookeeper.MemberOfQuorum
+        target: zookeeper_quorum
+
+  nimbus_vm:
+    type: dice.hosts.Medium
+    relationships:
+      - type: cloudify.openstack.server_connected_to_floating_ip
+        target: storm_floating_ip
+      - type: cloudify.openstack.server_connected_to_security_group
+        target: storm_security_group
+
+  nimbus:
+    type: dice.components.storm.Nimbus
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: nimbus_vm
+      - type: dice.relationships.storm.ConnectedToZookeeperQuorum
+        target: zookeeper_quorum
+
+  storm_vm:
+    type: dice.hosts.Medium
+    instances:
+      deploy: 3
+
+  storm:
+    type: dice.components.storm.Worker
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: storm_vm
+      - type: dice.relationships.storm.ConnectedToZookeeperQuorum
+        target: zookeeper_quorum
+      - type: dice.relationships.storm.ConnectedToNimbus
+        target: nimbus
+
+  wordcount:
+    type: dice.components.storm.Topology
+    properties:
+      application: http://dice-project.github.io/DICE-Deployment-Examples/topologies/storm-starter-topologies-1.0.1.jar
+      topology_name: dice-wordcount
+      topology_class: org.apache.storm.starter.WordCountTopology
+    relationships:
+      - type: dice.relationships.storm.SubmittedBy
+        target: nimbus
+      - type: dice.relationships.Needs
+        target: storm
+
+  zookeeper_floating_ip:
+    type: cloudify.openstack.nodes.FloatingIP
+
+  zookeeper_security_group:
+    type: cloudify.openstack.nodes.SecurityGroup
+    properties:
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          port: 2181
+        - remote_ip_prefix: 0.0.0.0/0
+          port: 22
+
+  storm_floating_ip:
+    type: cloudify.openstack.nodes.FloatingIP
+
+  storm_security_group:
+    type: cloudify.openstack.nodes.SecurityGroup
+    properties:
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          port: 8080
+        - remote_ip_prefix: 0.0.0.0/0
+          port: 6627
+        - remote_ip_prefix: 0.0.0.0/0
+          port: 22
+
+
+outputs:
+  storm_nimbus_address:
+    description: The address to be used by the storm client
+    value: { get_attribute: [storm_floating_ip, floating_ip_address] }
+  storm_nimbus_gui:
+    description: URL of the Storm nimbus gui
+    value: { concat: [ 'http://', { get_attribute: [storm_floating_ip, floating_ip_address] }, ':8080' ] }
+  wordcount_id:
+    description: Unique Storm topology ID
+    value: { get_attribute: [ wordcount, topology_id ] }
