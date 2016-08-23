@@ -1,4 +1,10 @@
-New in v.0.2.1:
+New in v.0.1.2:
+
+* Added examples for Apache Spark blueprints. Spark runs in
+  a stand-alone mode here.
+* Added examples for  Apache Cassandra blueprints.
+
+New in v.0.1.1:
 
 * Apache Storm blueprint available also for OpenStack.
 
