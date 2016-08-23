@@ -24,9 +24,6 @@ inputs:
     default: d3046a41-245a-4042-862e-59568e81f8fa
 
 node_templates:
-  virtual_ip:
-    type: cloudify.openstack.nodes.FloatingIP
-
   firewall:
     type: dice.firewall_rules.cassandra.Common
 
@@ -35,8 +32,6 @@ node_templates:
     relationships:
       - type: dice.relationships.ProtectedBy
         target: firewall
-      - type: cloudify.openstack.server_connected_to_floating_ip
-        target: virtual_ip
 
   seed:
     type: dice.components.cassandra.Seed

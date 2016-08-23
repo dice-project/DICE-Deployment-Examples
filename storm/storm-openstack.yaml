@@ -4,7 +4,7 @@ imports:
   - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
   - http://dice-project.github.io/cloudify-openstack-plugin/1.4/plugin.yaml
   - http://dice-project.github.io/cloudify-chef-plugin/1.3.2/plugin.yaml
-  - http://dice-project.github.io/DICE-Deployment-Cloudify/spec/openstack/0.1.2/plugin.yaml
+  - http://dice-project.github.io/DICE-Deployment-Cloudify/spec/openstack/develop/plugin.yaml
 
 
 inputs:
@@ -25,12 +25,19 @@ inputs:
 
 
 node_templates:
+  # Zookeeper
+  zookeeper_floating_ip:
+    type: dice.VirtualIP
+
+  zookeeper_security_group:
+    type: dice.firewall_rules.zookeeper.Server
+
   zookeeper_vm:
     type: dice.hosts.Medium
     relationships:
-      - type: cloudify.openstack.server_connected_to_floating_ip
+      - type: dice.relationships.IPAvailableFrom
         target: zookeeper_floating_ip
-      - type: cloudify.openstack.server_connected_to_security_group
+      - type: dice.relationships.ProtectedBy
         target: zookeeper_security_group
 
   zookeeper_quorum:
@@ -52,12 +59,19 @@ node_templates:
       - type: dice.relationships.zookeeper.MemberOfQuorum
         target: zookeeper_quorum
 
+  # Nimbus
+  storm_floating_ip:
+    type: dice.VirtualIP
+
+  storm_security_group:
+    type: dice.firewall_rules.storm.Nimbus
+
   nimbus_vm:
     type: dice.hosts.Medium
     relationships:
-      - type: cloudify.openstack.server_connected_to_floating_ip
+      - type: dice.relationships.IPAvailableFrom
         target: storm_floating_ip
-      - type: cloudify.openstack.server_connected_to_security_group
+      - type: dice.relationships.ProtectedBy
         target: storm_security_group
 
   nimbus:
@@ -83,6 +97,7 @@ node_templates:
       - type: dice.relationships.storm.ConnectedToNimbus
         target: nimbus
 
+  # Topology
   wordcount:
     type: dice.components.storm.Topology
     properties:
@@ -94,32 +109,6 @@ node_templates:
         target: nimbus
       - type: dice.relationships.Needs
         target: storm
-
-  zookeeper_floating_ip:
-    type: cloudify.openstack.nodes.FloatingIP
-
-  zookeeper_security_group:
-    type: cloudify.openstack.nodes.SecurityGroup
-    properties:
-      rules:
-        - remote_ip_prefix: 0.0.0.0/0
-          port: 2181
-        - remote_ip_prefix: 0.0.0.0/0
-          port: 22
-
-  storm_floating_ip:
-    type: cloudify.openstack.nodes.FloatingIP
-
-  storm_security_group:
-    type: cloudify.openstack.nodes.SecurityGroup
-    properties:
-      rules:
-        - remote_ip_prefix: 0.0.0.0/0
-          port: 8080
-        - remote_ip_prefix: 0.0.0.0/0
-          port: 6627
-        - remote_ip_prefix: 0.0.0.0/0
-          port: 22
 
 
 outputs:
