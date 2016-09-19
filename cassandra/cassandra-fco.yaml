@@ -1,51 +1,8 @@
-tosca_definitions_version: cloudify_dsl_1_2
+tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
-  - http://www.getcloudify.org/spec/cloudify/3.3.1/types.yaml
-  - http://dice-project.github.io/DICE-FCO-Plugin-Cloudify/0.1.1/plugin.yaml
-  - http://dice-project.github.io/cloudify-chef-plugin/1.3.2/plugin.yaml
   - http://dice-project.github.io/DICE-Deployment-Cloudify/spec/fco/develop/plugin.yaml
 
-
-inputs:
-  agent_user:
-    default: ubuntu
-
-  small_image_id:
-    default: 87978c6d-5ceb-39b2-8e8b-935503ad0307
-  small_server_type:
-    default: 2 GB / 1 CPU
-  small_disk:
-    default: 30Gb Storage
-
-  medium_image_id:
-    default: 87978c6d-5ceb-39b2-8e8b-935503ad0307
-  medium_server_type:
-    default: 2 GB / 1 CPU
-  medium_disk:
-    default: 30Gb Storage
-
-  large_image_id:
-    default: 87978c6d-5ceb-39b2-8e8b-935503ad0307
-  large_server_type:
-    default: 2 GB / 1 CPU
-  large_disk:
-    default: 30Gb Storage
-
-  username:
-    default: <username>
-  password:
-    default: <password>
-  customer:
-    default: <customer>
-  service_url:
-    default: <FCO base url>
-  agent_key:
-    default: <agent key uuid>
-  vdc:
-    default: <VDC uuid>
-  network:
-    default: <network uuid>
 
 node_templates:
   firewall:

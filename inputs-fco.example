@@ -1,0 +1,21 @@
+agent_user:         ubuntu
+
+small_image_id:     87978c6d-5ceb-39b2-8e8b-935503ad0307
+small_server_type:  2 GB / 1 CPU
+small_disk:         30Gb Storage
+
+medium_image_id:    87978c6d-5ceb-39b2-8e8b-935503ad0307
+medium_server_type: 2 GB / 1 CPU
+medium_disk:        30Gb Storage
+
+large_image_id:     87978c6d-5ceb-39b2-8e8b-935503ad0307
+large_server_type:  2 GB / 1 CPU
+large_disk:         30Gb Storage
+
+username:           <username>
+password:           <password>
+customer:           <customer>
+service_url:        <FCO base url>
+agent_key:          <agent key uuid>
+vdc:                <VDC uuid>
+network:            <network uuid>
