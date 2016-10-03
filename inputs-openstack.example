@@ -8,3 +8,6 @@ medium_flavor_id: d3046a41-245a-4042-862e-59568e81f8fa
 
 large_image_id:   ca290f2d-5163-483b-9dd5-fafe21517c0a
 large_flavor_id:  d3046a41-245a-4042-862e-59568e81f8fa
+
+# Set this to internal IP of DICE deployment service machine
+dns_server:       10.50.51.4

@@ -12,6 +12,9 @@ large_image_id:     87978c6d-5ceb-39b2-8e8b-935503ad0307
 large_server_type:  2 GB / 1 CPU
 large_disk:         30Gb Storage
 
+# Set this to IP of DICE deployment service machine
+dns_server:         109.231.122.45
+
 username:           <username>
 password:           <password>
 customer:           <customer>
