@@ -1,0 +1,52 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://dice-project.github.io/DICE-Deployment-Cloudify/spec/fco/develop/plugin.yaml
+
+
+node_templates:
+
+  zookeeper_fw:
+    type: dice.firewall_rules.zookeeper.Server
+
+  zookeeper_vm:
+    type: dice.hosts.Medium
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: zookeeper_fw
+
+  zookeeper_quorum:
+    type: dice.components.zookeeper.Quorum
+    relationships:
+      - type: dice.relationships.zookeeper.QuorumContains
+        target: zookeeper_vm
+
+  zookeeper:
+    type: dice.components.zookeeper.Server
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: zookeeper_vm
+      - type: dice.relationships.zookeeper.MemberOfQuorum
+        target: zookeeper_quorum
+
+  kafka_ip:
+    type: dice.VirtualIP
+
+  kafka_fw:
+    type: dice.firewall_rules.kafka.Broker
+
+  kafka_vm:
+    type: dice.hosts.Medium
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: kafka_fw
+      - type: dice.relationships.IPAvailableFrom
+        target: kafka_ip
+
+  kafka:
+    type: dice.components.kafka.Broker
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: kafka_vm
+      - type: dice.relationships.zookeeper.ConnectedToZookeeperQuorum
+        target: zookeeper_quorum
