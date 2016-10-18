@@ -1,16 +1,22 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
-  - http://dice-project.github.io/DICE-Deployment-Cloudify/spec/fco/0.2.1/plugin.yaml
+  - http://dice-project.github.io/DICE-Deployment-Cloudify/spec/fco/develop/plugin.yaml
 
 
 node_templates:
+
+  master_ip:
+    type: dice.VirtualIP
+
   master_fw:
     type: dice.firewall_rules.spark.Master
 
   master_vm:
     type: dice.hosts.Medium
     relationships:
+      - type: dice.relationships.IPAvailableFrom
+        target: master_ip
       - type: dice.relationships.ProtectedBy
         target: master_fw
 
@@ -26,7 +32,7 @@ node_templates:
   worker_vm:
     type: dice.hosts.Medium
     instances:
-      deploy: 1
+      deploy: 2
     relationships:
       - type: dice.relationships.ProtectedBy
         target: worker_fw
@@ -38,3 +44,28 @@ node_templates:
         target: worker_vm
       - type: dice.relationships.spark.ConnectedToMaster
         target: master
+
+  pi_calculation:
+    type: dice.components.spark.Application
+    properties:
+      jar: http://dice-project.github.io/DICE-Deployment-Examples/spark/simple-app-0.1.0.jar
+      class: eu.diceh2020.SimpleApp
+      name: pi_calc
+      args:
+        - 10
+    relationships:
+      - type: dice.relationships.spark.SubmittedBy
+        target: master
+      - type: dice.relationships.Needs
+        target: worker
+
+
+outputs:
+
+  spark_master_ui:
+    description: Apache Storm master UI
+    value:
+      concat:
+        - http://
+        - get_attribute: [ master_ip, floating_ip_address ]
+        - ":8080"
