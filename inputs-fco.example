@@ -22,3 +22,14 @@ service_url:        <FCO base url>
 agent_key:          <agent key uuid>
 vdc:                <VDC uuid>
 network:            <network uuid>
+
+# Java control
+java_version: "8"
+java_flavor:  openjdk
+
+# Monitoring inputs
+dmon_address:                10.50.51.43:5001
+logstash_graphite_address:   10.50.51.43:5002
+logstash_lumberjack_address: 10.50.51.43:5000
+logstash_udp_address:        10.50.51.43:25826
+logstash_lumberjack_crt:     INVALID_CRT

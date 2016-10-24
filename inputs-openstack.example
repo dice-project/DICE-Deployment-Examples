@@ -11,3 +11,14 @@ large_flavor_id:  d3046a41-245a-4042-862e-59568e81f8fa
 
 # Set this to internal IP of DICE deployment service machine
 dns_server:       10.50.51.4
+
+# Java control
+java_version: "8"
+java_flavor:  openjdk
+
+# Monitoring inputs
+dmon_address:                10.50.51.43:5001
+logstash_graphite_address:   10.50.51.43:5002
+logstash_lumberjack_address: 10.50.51.43:5000
+logstash_udp_address:        10.50.51.43:25826
+logstash_lumberjack_crt:     INVALID_CRT
