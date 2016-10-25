@@ -1,0 +1,112 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://dice-project.github.io/DICE-Deployment-Cloudify/spec/openstack/develop/plugin.yaml
+# For FCO, use next import:
+  #- http://dice-project.github.io/DICE-Deployment-Cloudify/spec/fco/develop/plugin.yaml
+
+
+node_templates:
+
+  # Data parser
+  data_parser_vm:
+    type: dice.hosts.Medium
+
+  data_parser:
+    type: dice.components.misc.ScriptRunner
+    properties:
+      script: scripts/install-data-parser.sh
+      language: bash
+      arguments:
+        - get_attribute: [ rabbitmq, fqdn ]
+      resources:
+        - resources/emitter.py
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: data_parser_vm
+      - type: dice.relationships.Needs
+        target: rabbitmq
+
+  # RabbitMQ
+  rabbitmq_firewall:
+    type: dice.firewall_rules.Base
+    properties:
+      rules:
+        - remote_ip_prefix: 0.0.0.0/0
+          port: 4369
+        - remote_ip_prefix: 0.0.0.0/0
+          port: 25672
+        - remote_ip_prefix: 0.0.0.0/0
+          port: 5672
+        - remote_ip_prefix: 0.0.0.0/0
+          port: 5671
+        - remote_ip_prefix: 0.0.0.0/0
+          port: 15672
+
+  rabbitmq_vm:
+    type: dice.hosts.Medium
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: rabbitmq_firewall
+
+  rabbitmq:
+    type: dice.components.misc.ScriptRunner
+    properties:
+      script: scripts/install-rabbitmq.sh
+      language: bash
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: rabbitmq_vm
+
+  # Drools
+  drools_vm:
+    type: dice.hosts.Medium
+
+  drools:
+    type: dice.components.misc.ScriptRunner
+    properties:
+      script: scripts/install-drools.sh
+      arguments:
+        - get_attribute: [ rabbitmq,       fqdn ]
+        - get_attribute: [ cassandra_seed, fqdn ]
+      resources:
+        - resources/transmitter.py
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: drools_vm
+      - type: dice.relationships.Needs
+        target: rabbitmq
+      - type: dice.relationships.Needs
+        target: cassandra_worker
+
+  # Cassandra
+  cassandra_firewall:
+    type: dice.firewall_rules.cassandra.Common
+
+  cassandra_seed_vm:
+    type: dice.hosts.Medium
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: cassandra_firewall
+
+  cassandra_seed:
+    type: dice.components.cassandra.Seed
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: cassandra_seed_vm
+
+  cassandra_worker_vm:
+    type: dice.hosts.Medium
+    instances:
+      deploy: 1
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: cassandra_firewall
+
+  cassandra_worker:
+    type: dice.components.cassandra.Worker
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: cassandra_worker_vm
+      - type: dice.relationships.cassandra.ConnectedToSeed
+        target: cassandra_seed
