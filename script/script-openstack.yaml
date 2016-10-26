@@ -12,12 +12,12 @@ node_templates:
   script:
     type: dice.components.misc.ScriptRunner
     properties:
-      script: missing.sh
+      script: resources/test-script.sh
       language: bash
       arguments:
-        - 1
+        - 10
         - abc
-        - 123.6
+        - fge
     relationships:
       - type: dice.relationships.ContainedIn
         target: vm
