@@ -1,0 +1,77 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://dice-project.github.io/DICE-Deployment-Cloudify/spec/openstack/develop/plugin.yaml
+
+
+node_templates:
+
+  master_ip:
+    type: dice.VirtualIP
+
+  master_fw:
+    type: dice.firewall_rules.spark.Master
+
+  master_vm:
+    type: dice.hosts.Medium
+    relationships:
+      - type: dice.relationships.IPAvailableFrom
+        target: master_ip
+      - type: dice.relationships.ProtectedBy
+        target: master_fw
+
+  master:
+    type: dice.components.spark.Master
+    properties:
+      monitoring:
+        enabled: true
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: master_vm
+
+  worker_fw:
+    type: dice.firewall_rules.spark.Worker
+
+  worker_vm:
+    type: dice.hosts.Medium
+    instances:
+      deploy: 2
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: worker_fw
+
+  worker:
+    type: dice.components.spark.Worker
+    properties:
+      monitoring:
+        enabled: true
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: worker_vm
+      - type: dice.relationships.spark.ConnectedToMaster
+        target: master
+
+  pi_calculation:
+    type: dice.components.spark.Application
+    properties:
+      jar: http://dice-project.github.io/DICE-Deployment-Examples/spark/simple-app-0.1.0.jar
+      class: eu.diceh2020.SimpleApp
+      name: pi_calc
+      args:
+        - 10
+    relationships:
+      - type: dice.relationships.spark.SubmittedBy
+        target: master
+      - type: dice.relationships.Needs
+        target: worker
+
+
+outputs:
+
+  spark_master_ui:
+    description: Apache Storm master UI
+    value:
+      concat:
+        - http://
+        - get_attribute: [ master_ip, floating_ip_address ]
+        - ":8080"
