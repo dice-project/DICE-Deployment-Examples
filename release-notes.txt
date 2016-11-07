@@ -1,3 +1,21 @@
+New in v.0.1.4:
+
+* Added a monitored Storm blueprint
+* Added a monitored Apache Spark blueprint
+* Updated Apache Spark example blueprint to demonstrate how application
+  submission can be done, including how to pass arguments to submitter
+* Added HDFS demo blueprint to demonstrate how to set up a small fully
+  functional HDFS server. Requires Consul server installed as part of
+  the DICE deployment service
+* Added Hadoop YARN example
+* Added sample blueprints for script runner, but with deliberatly missing
+  scripts to force authors to describe blueprint creation process in greater
+  detail, especially tarball creation process and upload
+* Added Apache Kafka sample blueprints to demonstrate the cluster setup and
+  to showcase connections that need to be added between various components
+* Added an example of a more complex mock-application (`data-pipeline`) to
+  demonstrate comibining shell scripts and Cassandra deployment
+
 New in v.0.1.3:
 
 * Updated blueprints to follow the modular nature of the
