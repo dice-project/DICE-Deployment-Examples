@@ -46,7 +46,8 @@ we execute
     $ dice-deploy-cli deploy UUID storm/storm-openstack.yaml
 
 Replace UUID placeholder in second command with output of the first command.
-And this is it.
+Also replace the last argument with `storm/storm-fco.yaml` if you are
+targetting FCO. And this is it.
 
 
 ## Deploying blueprint with bundled resources

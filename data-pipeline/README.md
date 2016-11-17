@@ -304,10 +304,15 @@ about this here and skip to blueprint preparation.
 Preparing blueprint tarball follows the standard procedure that has been
 described in [top level readme file][top-readme]. But for the sake of
 completeness, we provide a shell commands that can be used to create tarball.
+Please note the requirement of the blueprint to be named `blueprint.yaml` and
+placed in the subdirectory.
 
     $ T=$(mktemp -d)
     $ chmod 755 $T
-    $ cp -r blueprint.yaml resources scripts $T
+    $ cp blueprint-openstack.yaml $T/blueprint.yaml
+    $ cp -r resources scripts $T
     $ tar -cvzf blueprint.tar.gz -C $(dirname $T) $(basename $T)
     $ rm -rf $T
     $ unset T
+
+[top-readme]:../README.md#deploying-blueprint-with-bundled-resources
