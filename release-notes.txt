@@ -1,3 +1,8 @@
+New in v.0.1.5:
+
+* Added Spark pi calculation sources.
+* Split data-pipeline example into per-platform blueprints.
+
 New in v.0.1.4:
 
 * Added a monitored Storm blueprint
