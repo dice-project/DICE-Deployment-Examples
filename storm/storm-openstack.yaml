@@ -40,19 +40,19 @@ node_templates:
         target: zookeeper_quorum
 
   # Nimbus
-  storm_floating_ip:
+  nimbus_floating_ip:
     type: dice.VirtualIP
 
-  storm_security_group:
+  nimbus_security_group:
     type: dice.firewall_rules.storm.Nimbus
 
   nimbus_vm:
     type: dice.hosts.Medium
     relationships:
       - type: dice.relationships.IPAvailableFrom
-        target: storm_floating_ip
+        target: nimbus_floating_ip
       - type: dice.relationships.ProtectedBy
-        target: storm_security_group
+        target: nimbus_security_group
 
   nimbus:
     type: dice.components.storm.Nimbus
@@ -62,10 +62,16 @@ node_templates:
       - type: dice.relationships.storm.ConnectedToZookeeperQuorum
         target: zookeeper_quorum
 
+  storm_security_group:
+    type: dice.firewall_rules.storm.Worker
+
   storm_vm:
     type: dice.hosts.Medium
     instances:
       deploy: 3
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: storm_security_group
 
   storm:
     type: dice.components.storm.Worker
@@ -94,10 +100,14 @@ node_templates:
 outputs:
   storm_nimbus_address:
     description: The address to be used by the storm client
-    value: { get_attribute: [storm_floating_ip, floating_ip_address] }
+    value: { get_attribute: [nimbus_floating_ip, floating_ip_address] }
   storm_nimbus_gui:
     description: URL of the Storm nimbus gui
-    value: { concat: [ 'http://', { get_attribute: [storm_floating_ip, floating_ip_address] }, ':8080' ] }
+    value:
+      concat:
+        - "http://"
+        - get_attribute: [nimbus_floating_ip, floating_ip_address]
+        - ":8080"
   wordcount_id:
     description: Unique Storm topology ID
     value: { get_attribute: [ wordcount, topology_id ] }
