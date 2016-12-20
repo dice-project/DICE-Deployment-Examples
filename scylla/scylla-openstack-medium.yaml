@@ -23,7 +23,7 @@ node_templates:
   worker_vm:
     type: dice.hosts.centos7.Medium
     instances:
-      deploy: 1
+      deploy: 3
     relationships:
       - type: dice.relationships.ProtectedBy
         target: firewall

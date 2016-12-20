@@ -6,22 +6,22 @@ imports:
 
 node_templates:
   firewall:
-    type: dice.firewall_rules.scylla.Common
+    type: dice.firewall_rules.cassandra.Common
 
   seed_vm:
-    type: dice.hosts.centos7.Large
+    type: dice.hosts.centos7.Medium
     relationships:
       - type: dice.relationships.ProtectedBy
         target: firewall
 
   seed:
-    type: dice.components.scylla.Seed
+    type: dice.components.cassandra.Seed
     relationships:
       - type: dice.relationships.ContainedIn
         target: seed_vm
 
   worker_vm:
-    type: dice.hosts.centos7.Large
+    type: dice.hosts.centos7.Medium
     instances:
       deploy: 3
     relationships:
@@ -29,9 +29,9 @@ node_templates:
         target: firewall
 
   worker:
-    type: dice.components.scylla.Worker
+    type: dice.components.cassandra.Worker
     relationships:
       - type: dice.relationships.ContainedIn
         target: worker_vm
-      - type: dice.relationships.scylla.ConnectedToSeed
+      - type: dice.relationships.cassandra.ConnectedToSeed
         target: seed
