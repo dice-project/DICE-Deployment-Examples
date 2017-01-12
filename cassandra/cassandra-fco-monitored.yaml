@@ -1,0 +1,43 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - http://dice-project.github.io/DICE-Deployment-Cloudify/spec/fco/develop/plugin.yaml
+
+
+node_templates:
+  firewall:
+    type: dice.firewall_rules.cassandra.Common
+
+  seed_vm:
+    type: dice.hosts.Medium
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: firewall
+
+  seed:
+    type: dice.components.cassandra.Seed
+    properties:
+      monitoring:
+        enabled: true
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: seed_vm
+
+  worker_vm:
+    type: dice.hosts.Medium
+    instances:
+      deploy: 1
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: firewall
+
+  worker:
+    type: dice.components.cassandra.Worker
+    properties:
+      monitoring:
+        enabled: true
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: worker_vm
+      - type: dice.relationships.cassandra.ConnectedToSeed
+        target: seed
