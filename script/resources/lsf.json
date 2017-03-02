@@ -1,0 +1,8 @@
+{
+  "files": [
+    {
+      "paths": [ "/tmp/dummy.log" ],
+      "fields": { "type": "dummy-log" }
+    }
+  ]
+}
