@@ -1,3 +1,7 @@
+New in 0.1.8:
+
+* Update DICE TOSCA library location
+
 New in v.0.1.7:
 
 * Monitored Cassandra blueprint has been added.
