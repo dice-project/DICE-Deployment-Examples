@@ -1,0 +1,105 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://dice-project.github.io/DICE-Deployment-Cloudify/spec/openstack/tb-wip/plugin.yaml
+
+node_templates:
+
+  mongo_fw:
+    type: dice.firewall_rules.mongo.Common
+
+  config_vms:
+    type: dice.hosts.Small
+    instances:
+      deploy: 3
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: mongo_fw
+
+  config_mongo:
+    type: dice.components.mongo.ConfigServer
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: config_vms
+
+  config:
+    type: dice.components.mongo.Group
+    relationships:
+      - type: dice.relationships.mongo.ComposedOf
+        target: config_mongo
+
+  shard_1_vms:
+    type: dice.hosts.Small
+    instances:
+      deploy: 3
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: mongo_fw
+
+  shard_1_mongo:
+    type: dice.components.mongo.ShardServer
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: shard_1_vms
+
+  shard_1:
+    type: dice.components.mongo.Group
+    relationships:
+      - type: dice.relationships.mongo.ComposedOf
+        target: shard_1_mongo
+
+  shard_2_vms:
+    type: dice.hosts.Small
+    instances:
+      deploy: 3
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: mongo_fw
+
+  shard_2_mongo:
+    type: dice.components.mongo.ShardServer
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: shard_2_vms
+
+  shard_2:
+    type: dice.components.mongo.Group
+    relationships:
+      - type: dice.relationships.mongo.ComposedOf
+        target: shard_2_mongo
+
+  router_ip:
+    type: dice.VirtualIP
+
+  router_vm:
+    type: dice.hosts.Small
+    properties:
+      bind_ip: global
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: mongo_fw
+      - type: dice.relationships.IPAvailableFrom
+        target: router_ip
+
+  router:
+    type: dice.components.mongo.Router
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: router_vm
+      - type: dice.relationships.mongo.ConfigurationStoredIn
+        target: config
+      - type: dice.relationships.mongo.RoutesTo
+        target: shard_1
+      - type: dice.relationships.mongo.RoutesTo
+        target: shard_2
+
+
+outputs:
+
+  mongo_access:
+    description: Mongo client connection details
+    value:
+      concat:
+        - "mongo --host "
+        - { get_attribute: [ router_ip, floating_ip_address ] }
+        - :27017

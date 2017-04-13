@@ -1,0 +1,40 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://dice-project.github.io/DICE-Deployment-Cloudify/spec/openstack/tb-wip/plugin.yaml
+
+node_templates:
+
+  mongo_fw:
+    type: dice.firewall_rules.mongo.Common
+
+  replica_vms:
+    type: dice.hosts.Small
+    instances:
+      deploy: 3
+    relationships:
+      - type: dice.relationships.ProtectedBy
+        target: mongo_fw
+
+  replica_mongo:
+    type: dice.components.mongo.ReplicaServer
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: replica_vms
+
+  replica:
+    type: dice.components.mongo.Group
+    relationships:
+      - type: dice.relationships.mongo.ComposedOf
+        target: replica_mongo
+
+
+outputs:
+
+  mongo_access:
+    description: Mongo client connection details
+    value:
+      concat:
+        - "mongo --host "
+        - { get_attribute: [ replica, replica_name ] }
+        - /ONE_OF_THE_MONGO_HOSTS:27017
