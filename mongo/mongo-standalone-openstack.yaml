@@ -63,3 +63,21 @@ outputs:
         - "mongo --host "
         - get_attribute: [ standalone_mongo, fqdn ]
         - :27017
+
+  admin_user:
+    description: Mongo user administrator
+    value:
+      concat:
+        - "username: "
+        - get_attribute: [ standalone_mongo, admin_user ]
+        - " | password: "
+        - get_attribute: [ standalone_mongo, admin_pass ]
+
+  db_user:
+    description: Regular Mongo user
+    value:
+      concat:
+        - "username: "
+        - get_property: [ user, username ]
+        - " | password: "
+        - get_attribute: [ user, password ]
