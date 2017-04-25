@@ -9,16 +9,49 @@ node_templates:
     type: dice.firewall_rules.mongo.Common
 
   standalone_vm:
-    type: dice.hosts.Small
+    type: dice.hosts.Medium
     relationships:
       - type: dice.relationships.ProtectedBy
         target: mongo_fw
 
   standalone_mongo:
     type: dice.components.mongo.Server
+    properties:
+      monitoring:
+        enabled: true
     relationships:
       - type: dice.relationships.ContainedIn
         target: standalone_vm
+
+  db1:
+    type: dice.components.mongo.DB
+    properties:
+      name: sample_db1
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: standalone_mongo
+
+  db2:
+    type: dice.components.mongo.DB
+    properties:
+      name: sample_db2
+      monitoring:
+        enabled: true
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: standalone_mongo
+
+  user:
+    type: dice.components.mongo.User
+    properties:
+      username: test_user
+    relationships:
+      - type: dice.relationships.mongo.HasRightsToUse
+        target: db1
+      - type: dice.relationships.mongo.HasRightsToUse
+        target: db2
+      - type: dice.relationships.ContainedIn
+        target: standalone_mongo
 
 
 outputs:
@@ -28,5 +61,5 @@ outputs:
     value:
       concat:
         - "mongo --host "
-        - { get_attribute: [ standalone_mongo, fqdn ] }
+        - get_attribute: [ standalone_mongo, fqdn ]
         - :27017
