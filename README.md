@@ -6,16 +6,6 @@ blueprints. To test and run them, use the [DICE Deployment Service][dds].
 [dds]: https://github.com/dice-project/DICE-Deployment-Service
 
 
-# Notes on content
-
-There are currently blueprints for two platforms provided: for OpenStack and
-FCO. Template part of the blueprints is identical, since DICE TOSCA library
-abstracts away the differences in this part of the blueprint.
-
-Platforms have different requirements when it comes to imports and inputs,
-since each platform needs to be configured separately.
-
-
 # Deploying samples
 
 In this section, we get our hands dirty and demonstrate how to deploy
@@ -43,11 +33,9 @@ Example of standalone blueprint would be `spark`. When we want to deploy it,
 we execute
 
     $ dice-deploy-cli create "Apache Storm deployment"
-    $ dice-deploy-cli deploy UUID storm/storm-openstack.yaml
+    $ dice-deploy-cli deploy UUID storm/storm.yaml
 
 Replace UUID placeholder in second command with output of the first command.
-Also replace the last argument with `storm/storm-fco.yaml` if you are
-targetting FCO. And this is it.
 
 
 ## Deploying blueprint with bundled resources
@@ -73,7 +61,7 @@ relative to blueprint location. Note that YAML file that contains main
 blueprint, needs to be named `blueprint.yaml` in order for DICE Deployment
 Service to know where to start.
 
-    $ cp script-openstack.yaml $TMP_FOLDER/blueprint.yaml
+    $ cp script.yaml $TMP_FOLDER/blueprint.yaml
     $ cp -r resources $TMP_FOLDER
 
 The layout should look something like this:

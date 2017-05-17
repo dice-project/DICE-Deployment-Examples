@@ -1,0 +1,26 @@
+# Select proper platform (aws, fco, openstack)
+platform: openstack
+
+# This is only needed on FCO (spefify disk offer UUID)
+small_disk_type: dummy
+medium_disk_type: dummy
+large_disk_type: dummy
+
+# Instance types
+small_instance_type: t2.small # Amazon
+medium_instance_type: 93e4960e-9b6d-454f-b422-0d50121b01c6a # OpenStack
+large_instance_type: ca290f2d-5163-483b-9dd5-fafe21517c0a # FCO
+
+# OS images
+ubuntu_image_id: ca290f2d-5163-483b-9dd5-fafe21517c0a # OpenStack, FCO
+centos_image_id: ami-764856243 # AWS
+
+# Internal DNS server - set to internal IP of the DICE Deployment Service
+dns_server: dummy
+
+# Monitoring inputs
+dmon_address:                10.50.51.43:5001
+logstash_graphite_address:   10.50.51.43:5002
+logstash_lumberjack_address: 10.50.51.43:5000
+logstash_udp_address:        10.50.51.43:25826
+logstash_lumberjack_crt:     INVALID_CRT

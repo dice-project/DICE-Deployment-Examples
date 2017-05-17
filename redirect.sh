@@ -1,9 +1,10 @@
 #!/bin/bash
 
 DEFAULT_BRANCH=tb-wip
-BASE="http://dice-project.github.io/DICE-Deployment-Cloudify"
-NEEDLE="$BASE/spec/([^/]+)/__SRC__/plugin\\.yaml"
-REPLACEMENT="$BASE/spec/\\1/__BRANCH__/plugin.yaml"
+BASE="https://github.com/dice-project/DICE-Deployment-Cloudify"
+BASE="$BASE/releases/download"
+NEEDLE="$BASE/__SRC__/full\\.yaml"
+REPLACEMENT="$BASE/__BRANCH__/full.yaml"
 
 function usage ()
 {

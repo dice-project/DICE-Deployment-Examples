@@ -38,7 +38,7 @@ So, first thing we need to do is setup `data_parser`, which is shown in the
 following snippet.
 
     data_parser_vm:
-      type: dice.hosts.Medium
+      type: dice.hosts.ubuntu.Medium
     
     data_parser:
       type: dice.components.misc.ScriptRunner
@@ -85,19 +85,24 @@ of code:
       type: dice.firewall_rules.Base
       properties:
         rules:
-          - remote_ip_prefix: 0.0.0.0/0
+          - ip_prefix: 0.0.0.0/0
             port: 4369
-          - remote_ip_prefix: 0.0.0.0/0
+            protocol: tcp
+          - ip_prefix: 0.0.0.0/0
             port: 25672
-          - remote_ip_prefix: 0.0.0.0/0
+            protocol: tcp
+          - ip_prefix: 0.0.0.0/0
             port: 5672
-          - remote_ip_prefix: 0.0.0.0/0
+            protocol: tcp
+          - ip_prefix: 0.0.0.0/0
             port: 5671
-          - remote_ip_prefix: 0.0.0.0/0
+            protocol: tcp
+          - ip_prefix: 0.0.0.0/0
             port: 15672
+            protocol: tcp
     
     rabbitmq_vm:
-      type: dice.hosts.Medium
+      type: dice.hosts.ubuntu.Medium
       relationships:
         - type: dice.relationships.ProtectedBy
           target: rabbitmq_firewall
@@ -126,7 +131,7 @@ RabbitMQ does not need any inputs or additional resources, `arguments` and
 For drools installation, we need to place next snippet into blueprint:
 
     drools_vm:
-      type: dice.hosts.Medium
+      type: dice.hosts.ubuntu.Medium
     
     drools:
       type: dice.components.misc.ScriptRunner
@@ -156,7 +161,7 @@ library, we do not have to write much down.
       type: dice.firewall_rules.cassandra.Common
     
     cassandra_seed_vm:
-      type: dice.hosts.Medium
+      type: dice.hosts.ubuntu.Medium
       relationships:
         - type: dice.relationships.ProtectedBy
           target: cassandra_firewall
@@ -168,7 +173,7 @@ library, we do not have to write much down.
           target: cassandra_seed_vm
     
     cassandra_worker_vm:
-      type: dice.hosts.Medium
+      type: dice.hosts.ubuntu.Medium
       instances:
         deploy: 1
       relationships:

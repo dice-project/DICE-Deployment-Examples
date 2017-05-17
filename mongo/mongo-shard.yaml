@@ -9,7 +9,7 @@ node_templates:
     type: dice.firewall_rules.mongo.Common
 
   config_vms:
-    type: dice.hosts.Small
+    type: dice.hosts.ubuntu.Small
     instances:
       deploy: 3
     relationships:
@@ -29,7 +29,7 @@ node_templates:
         target: config_mongo
 
   shard_1_vms:
-    type: dice.hosts.Small
+    type: dice.hosts.ubuntu.Small
     instances:
       deploy: 3
     relationships:
@@ -49,7 +49,7 @@ node_templates:
         target: shard_1_mongo
 
   shard_2_vms:
-    type: dice.hosts.Small
+    type: dice.hosts.ubuntu.Small
     instances:
       deploy: 3
     relationships:
@@ -72,7 +72,7 @@ node_templates:
     type: dice.VirtualIP
 
   router_vm:
-    type: dice.hosts.Small
+    type: dice.hosts.ubuntu.Small
     properties:
       bind_ip: global
     relationships:

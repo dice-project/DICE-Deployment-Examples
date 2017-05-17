@@ -9,7 +9,7 @@ node_templates:
     type: dice.firewall_rules.mongo.Common
 
   replica_vms:
-    type: dice.hosts.Small
+    type: dice.hosts.ubuntu.Small
     instances:
       deploy: 3
     relationships:

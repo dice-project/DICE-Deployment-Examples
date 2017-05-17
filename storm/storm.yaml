@@ -1,11 +1,11 @@
 tosca_definitions_version: cloudify_dsl_1_3
 
 imports:
-  - https://github.com/dice-project/DICE-Deployment-Cloudify/releases/download/0.2.7/fco.yaml
+  - https://github.com/dice-project/DICE-Deployment-Cloudify/releases/download/0.7.0/full.yaml
 
 
 node_templates:
-
+  # Zookeeper
   zookeeper_floating_ip:
     type: dice.VirtualIP
 
@@ -13,7 +13,7 @@ node_templates:
     type: dice.firewall_rules.zookeeper.Server
 
   zookeeper_vm:
-    type: dice.hosts.Medium
+    type: dice.hosts.ubuntu.Medium
     relationships:
       - type: dice.relationships.IPAvailableFrom
         target: zookeeper_floating_ip
@@ -39,6 +39,7 @@ node_templates:
       - type: dice.relationships.zookeeper.MemberOfQuorum
         target: zookeeper_quorum
 
+  # Nimbus
   nimbus_floating_ip:
     type: dice.VirtualIP
 
@@ -46,7 +47,7 @@ node_templates:
     type: dice.firewall_rules.storm.Nimbus
 
   nimbus_vm:
-    type: dice.hosts.Medium
+    type: dice.hosts.ubuntu.Medium
     relationships:
       - type: dice.relationships.IPAvailableFrom
         target: nimbus_floating_ip
@@ -55,9 +56,6 @@ node_templates:
 
   nimbus:
     type: dice.components.storm.Nimbus
-    properties:
-      monitoring:
-        enabled: true
     relationships:
       - type: dice.relationships.ContainedIn
         target: nimbus_vm
@@ -68,18 +66,15 @@ node_templates:
     type: dice.firewall_rules.storm.Worker
 
   storm_vm:
-    type: dice.hosts.Medium
+    type: dice.hosts.ubuntu.Medium
     instances:
-      deploy: 1
+      deploy: 3
     relationships:
       - type: dice.relationships.ProtectedBy
         target: storm_security_group
 
   storm:
     type: dice.components.storm.Worker
-    properties:
-      monitoring:
-        enabled: true
     relationships:
       - type: dice.relationships.ContainedIn
         target: storm_vm
@@ -88,14 +83,15 @@ node_templates:
       - type: dice.relationships.storm.ConnectedToNimbus
         target: nimbus
 
+  # Topology
   wordcount:
     type: dice.components.storm.Topology
     properties:
-      monitoring:
-        enabled: true
       application: http://dice-project.github.io/DICE-Deployment-Examples/topologies/storm-starter-topologies-1.0.1.jar
       topology_name: dice-wordcount
       topology_class: org.apache.storm.starter.WordCountTopology
+      configuration:
+        worker.heap.memory.mb: 2048
     relationships:
       - type: dice.relationships.storm.SubmittedBy
         target: nimbus
