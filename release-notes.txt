@@ -1,3 +1,9 @@
+New in 0.2.0:
+
+* Examples are now updated to the platform abstracted TOSCA technology
+  library in its version 0.7.0.
+* Added example blueprints for MongoDB.
+
 New in 0.1.8:
 
 * Update DICE TOSCA library location
