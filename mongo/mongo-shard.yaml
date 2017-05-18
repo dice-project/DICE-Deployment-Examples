@@ -73,8 +73,6 @@ node_templates:
 
   router_vm:
     type: dice.hosts.ubuntu.Small
-    properties:
-      bind_ip: global
     relationships:
       - type: dice.relationships.ProtectedBy
         target: mongo_fw
@@ -83,6 +81,8 @@ node_templates:
 
   router:
     type: dice.components.mongo.Router
+    properties:
+      bind_ip: global
     relationships:
       - type: dice.relationships.ContainedIn
         target: router_vm
