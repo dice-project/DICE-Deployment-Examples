@@ -102,13 +102,13 @@ node_templates:
 outputs:
   storm_nimbus_address:
     description: The address to be used by the storm client
-    value: { get_attribute: [nimbus_floating_ip, floating_ip_address] }
+    value: { get_attribute: [nimbus_floating_ip, address] }
   storm_nimbus_gui:
     description: URL of the Storm nimbus gui
     value:
       concat:
         - "http://"
-        - get_attribute: [nimbus_floating_ip, floating_ip_address]
+        - get_attribute: [nimbus_floating_ip, address]
         - ":8080"
   wordcount_id:
     description: Unique Storm topology ID

@@ -52,6 +52,6 @@ outputs:
     value:
       concat:
         - "http://"
-        - { get_attribute: [ rm_ip, floating_ip_address ] }
+        - { get_attribute: [ rm_ip, address ] }
         - ":8088"
 

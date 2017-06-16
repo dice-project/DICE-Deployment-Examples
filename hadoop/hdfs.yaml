@@ -52,5 +52,5 @@ outputs:
     value:
       concat:
         - "http://"
-        - { get_attribute: [ nn_ip, floating_ip_address ] }
+        - { get_attribute: [ nn_ip, address ] }
         - ":50070"

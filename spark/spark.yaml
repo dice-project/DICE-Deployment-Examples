@@ -67,5 +67,5 @@ outputs:
     value:
       concat:
         - http://
-        - get_attribute: [ master_ip, floating_ip_address ]
+        - get_attribute: [ master_ip, address ]
         - ":8080"

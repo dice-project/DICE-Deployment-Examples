@@ -101,5 +101,5 @@ outputs:
     value:
       concat:
         - "mongo --host "
-        - { get_attribute: [ router_ip, floating_ip_address ] }
+        - { get_attribute: [ router_ip, address ] }
         - :27017
