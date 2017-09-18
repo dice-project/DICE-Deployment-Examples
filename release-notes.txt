@@ -1,3 +1,11 @@
+New in 0.2.1:
+
+* Streamlined the virtual IP address attribute use to the v.0.7.x
+  format.
+* Fixed the text in the Spark examples where the description text for
+  outputs was inappropriate.
+* Set all examples to use version 0.7.2 of the DICE TOSCA library.
+
 New in 0.2.0:
 
 * Examples are now updated to the platform abstracted TOSCA technology
