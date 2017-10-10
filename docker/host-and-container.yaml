@@ -1,0 +1,58 @@
+tosca_definitions_version: cloudify_dsl_1_3
+
+imports:
+  - https://github.com/dice-project/DICE-Deployment-Cloudify/releases/download/0.7.5/full.yaml
+
+
+node_templates:
+
+  ip:
+    type: dice.VirtualIP
+
+  fw:
+    type: dice.firewall_rules.docker.Server
+
+  fw_ephemeral:
+    type: dice.firewall_rules.Base
+    properties:
+      rules:
+        # Next rule covers most often used ephemeral port range on Linux.
+        - ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          from_port: 32768
+          to_port: 61000
+
+  vm:
+    type: dice.hosts.ubuntu.Medium
+    relationships:
+      - type: dice.relationships.IPAvailableFrom
+        target: ip
+      - type: dice.relationships.ProtectedBy
+        target: fw
+      - type: dice.relationships.ProtectedBy
+        target: fw_ephemeral
+
+  docker:
+    type: dice.components.docker.Server
+    relationships:
+      - type: dice.relationships.ContainedIn
+        target: vm
+
+  hello:
+    type: dice.components.docker.Container
+    properties:
+      image: nginx
+      tag: latest
+      port_mapping:
+        80/tcp: 9876
+    relationships:
+      - type: dice.relationships.docker.HostedOn
+        target: docker
+
+
+outputs:
+  ip: { value: { get_attribute: [ docker, address ] } }
+  id: { value: { get_attribute: [ hello, id ] } }
+  name: { value: { get_attribute: [ hello, name ] } }
+  ports_user: { value: { get_property: [ hello, port_mapping ] } }
+  ports_inst: { value: { get_attribute: [ hello, port_mapping ] } }
